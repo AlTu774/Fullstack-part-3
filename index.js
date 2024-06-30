@@ -28,8 +28,17 @@ app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
 
+app.get('/api/persons/:id', (request, response) => {
+    const id = request.params.id
+    const person = persons.find(contact => contact.id == id)
+    if (person == undefined) {
+        response.status(404).end()
+    }
+    response.json(person)  
+})
+
 app.get('/info', (request, response) => {
-    const date = new Date();
+    const date = new Date()
     const contacts = persons.length
     response.send(
         `<div>
