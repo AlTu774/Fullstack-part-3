@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 let persons = [
     { 
       "id": "1",
@@ -48,6 +50,20 @@ app.delete('/api/persons/:id', (request, response) => {
             return (personInList.id !== person.id)})
         response.status(204).end()
     }
+})
+
+app.post('/api/persons', (request, response) => {
+    newPerson = request.body
+    newPerson.id = Math.floor(Math.random()*100)
+    if (!newPerson.name || !newPerson.number) {
+        return response.status(400).json({error: "contact doesn't contain a name or a number"})
+    }
+    const names = persons.map(person => person.name)
+    if (names.find(name => name == newPerson.name)) {
+        return response.status(400).json({error: "contact name must be unique"})
+    }
+    persons.push(newPerson)
+    response.json(newPerson)
 })
 
 app.get('/info', (request, response) => {
