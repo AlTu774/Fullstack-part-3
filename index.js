@@ -1,7 +1,9 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
+app.use(morgan('tiny'))
 
 let persons = [
     { 
@@ -34,7 +36,7 @@ app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
     const person = persons.find(contact => contact.id == id)
     if (person == undefined) {
-        response.status(404).end()
+        return response.status(404).end()
     }
     response.json(person)  
 })
