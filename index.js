@@ -1,12 +1,12 @@
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
+const cors = require('cors')
+
 
 app.use(express.json())
 
-/*const DataPrint = (data) => {
-    return json.stringify(data)
-}*/
+app.use(cors())
 
 morgan.token('data', (req, res) => {
     if (req.method == "POST") {
@@ -69,7 +69,6 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-    morgan.token('type', function (req, res) { return ("lol") })
     newPerson = request.body
     newPerson.id = Math.floor(Math.random()*100)
     if (!newPerson.name || !newPerson.number) {
