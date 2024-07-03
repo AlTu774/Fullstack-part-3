@@ -3,7 +3,21 @@ const morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
-app.use(morgan('tiny'))
+
+/*const DataPrint = (data) => {
+    return json.stringify(data)
+}*/
+
+morgan.token('data', (req, res) => {
+    if (req.method == "POST") {
+    return JSON.stringify(req.body)
+    }
+    else {
+        return ''
+    }
+})
+
+app.use(morgan(':method :url :res[content-length] - :response-time ms :data'))
 
 let persons = [
     { 
@@ -55,6 +69,7 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
+    morgan.token('type', function (req, res) { return ("lol") })
     newPerson = request.body
     newPerson.id = Math.floor(Math.random()*100)
     if (!newPerson.name || !newPerson.number) {
@@ -81,4 +96,5 @@ app.get('/info', (request, response) => {
 
 const PORT = 3001
 app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
 })
