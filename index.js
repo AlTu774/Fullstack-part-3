@@ -2,6 +2,8 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
+const dotenv = require("dotenv")
+dotenv.config()
 
 
 app.use(express.json())
@@ -20,6 +22,23 @@ morgan.token('data', (req, res) => {
 })
 
 app.use(morgan(':method :url :res[content-length] - :response-time ms :data'))
+
+const mongoose = require('mongoose')
+
+const password = process.argv[2]
+const newName = process.argv[3]
+const newNumber = process.argv[4]
+
+const url = process.env.MONGODB_URL
+
+mongoose.connect(url)
+
+const personSchema = mongoose.Schema({
+    name: String,
+    number: String
+})
+
+const Person = mongoose.model("Person", personSchema)
 
 let persons = [
     { 
@@ -45,7 +64,9 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then(people => {
+        response.json(people)
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
