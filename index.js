@@ -2,8 +2,7 @@ const express = require('express')
 const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
-const dotenv = require("dotenv")
-dotenv.config()
+const Person = require('./models/Person')
 
 
 app.use(express.json())
@@ -23,22 +22,6 @@ morgan.token('data', (req, res) => {
 
 app.use(morgan(':method :url :res[content-length] - :response-time ms :data'))
 
-const mongoose = require('mongoose')
-
-const password = process.argv[2]
-const newName = process.argv[3]
-const newNumber = process.argv[4]
-
-const url = process.env.MONGODB_URL
-
-mongoose.connect(url)
-
-const personSchema = mongoose.Schema({
-    name: String,
-    number: String
-})
-
-const Person = mongoose.model("Person", personSchema)
 
 let persons = [
     { 
@@ -70,12 +53,12 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    const person = persons.find(contact => contact.id == id)
-    if (person == undefined) {
-        return response.status(404).end()
-    }
-    response.json(person)  
+    const personId = request.params.id
+    Person.findById(personId).then(person => { 
+        response.json(person)})
+        .catch(error => 
+            {return response.status(404).end()}
+        )
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -97,12 +80,18 @@ app.post('/api/persons', (request, response) => {
     if (!newPerson.name || !newPerson.number) {
         return response.status(400).json({error: "contact doesn't contain a name or a number"})
     }
-    const names = persons.map(person => person.name)
-    if (names.find(name => name == newPerson.name)) {
-        return response.status(400).json({error: "contact name must be unique"})
-    }
-    persons.push(newPerson)
-    response.json(newPerson)
+
+    Person.find({name: newPerson.name}).then(name => {
+        if (name != undefined) {
+            return response.status(400).json({error: "contact name must be unique"})
+        }
+    })
+
+    const person = Person({
+        name: newPerson.name,
+        number: newPerson.number
+    })
+    person.save().then(response.json(person))
 })
 
 app.get('/info', (request, response) => {
