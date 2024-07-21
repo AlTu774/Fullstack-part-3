@@ -66,22 +66,15 @@ app.delete('/api/persons/:id', (request, response, next) => {
         response.status(204).end()
     })
     .catch(error => next(error))
-    //.catch(error => {
-    //    response.status(404).end()
-    //})
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     newPerson = request.body
-    newPerson.id = Math.floor(Math.random()*100)
     if (!newPerson.name || !newPerson.number) {
         return response.status(400).json({error: "contact doesn't contain a name or a number"})
     }
 
     Person.find({name: newPerson.name}).then(name => {
-        if (name == null) {
-            return response.status(400).json({error: "contact name must be unique"})
-        }
         const person = Person({
             name: newPerson.name,
             number: newPerson.number
@@ -90,7 +83,23 @@ app.post('/api/persons', (request, response) => {
         person.save().then(result => {
             return response.json(person)
         })
+        .catch(error => next(error))
     })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const updated = request.body
+    const updatedContact = {
+        "id": updated.id,
+        "name": updated.name,
+        "number": updated.number
+    }
+    
+    Person.findByIdAndUpdate(request.params.id, updatedContact, {new: true})
+    .then(contact => {
+        response.json(contact)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/info', (request, response) => {
