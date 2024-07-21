@@ -63,7 +63,13 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
     const id = request.params.id
-    let person = persons.find(contact => contact.id == id)
+    Person.findByIdAndDelete(id).then(result => {
+        response.status(204).end()
+    })
+    .catch(error => {
+        response.status(404).end()
+    })
+    /*let person = persons.find(contact => contact.id == id)
     if (person == undefined) {
         response.status(404).end()
     }
@@ -72,6 +78,7 @@ app.delete('/api/persons/:id', (request, response) => {
             return (personInList.id !== person.id)})
         response.status(204).end()
     }
+    */
 })
 
 app.post('/api/persons', (request, response) => {
@@ -82,16 +89,18 @@ app.post('/api/persons', (request, response) => {
     }
 
     Person.find({name: newPerson.name}).then(name => {
-        if (name != undefined) {
+        if (name == null) {
             return response.status(400).json({error: "contact name must be unique"})
         }
+        const person = Person({
+            name: newPerson.name,
+            number: newPerson.number
+        })
+        
+        person.save().then(result => {
+            return response.json(person)
+        })
     })
-
-    const person = Person({
-        name: newPerson.name,
-        number: newPerson.number
-    })
-    person.save().then(response.json(person))
 })
 
 app.get('/info', (request, response) => {
