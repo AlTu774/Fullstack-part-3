@@ -104,13 +104,15 @@ app.put('/api/persons/:id', (request, response, next) => {
 
 app.get('/info', (request, response) => {
     const date = new Date()
-    const contacts = persons.length
-    response.send(
-        `<div>
-        <p>Phonebook has info for ${contacts} people</p>
-        <p>${date}</p>
-        </div>`
-    )
+    Person.find({}).then(people => {
+        const count = people.length
+        response.send(
+            `<div>
+            <p>Phonebook has info for ${count} people</p>
+            <p>${date}</p>
+            </div>`
+        )
+    })
 })
 
 const errorHandler = (error, request, response, next) => {
