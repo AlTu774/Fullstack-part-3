@@ -19,7 +19,18 @@ const personSchema = mongoose.Schema({
         type: String,
         minLength: 3
     },
-    number: String
+    number: {
+        type: String,
+        minLength: 8,
+        validate: {
+            validator: function(val) {
+                correctForm1 = /^\d{2}-\d+/
+                correctForm2 = /^\d{3}-\d+/
+                return (correctForm1.test(val) || correctForm2.test(val))
+            },
+            message: "Phone number is not the right format"
+        }
+    }
 })
 
 personSchema.set('toJSON', {
