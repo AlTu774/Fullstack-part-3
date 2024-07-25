@@ -13,16 +13,16 @@ const personSchema = mongoose.Schema({
     number: String
 })
 
-const Person = mongoose.model("Person", personSchema)
+const Person = mongoose.model('Person', personSchema)
 
-if (newName == undefined || newNumber == undefined) {
-    console.log("phonebook:")
+if (newName === undefined || newNumber === undefined) {
+    console.log('phonebook:')
     Person.find({}).then(result => {
         result.forEach(contact => {
             console.log(`${contact.name} ${contact.number}`)
-        });
+        })
         mongoose.connection.close()
-    })      
+    })
 }
 
 else {
@@ -31,8 +31,8 @@ else {
         number: newNumber
     })
 
-    person.save().then(result => {
+    person.save().then(() => {
         console.log(`added ${newName} ${newNumber} to the phonebook`)
         mongoose.connection.close()
-        })
+    })
 }

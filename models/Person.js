@@ -1,18 +1,16 @@
 const mongoose = require('mongoose')
-const dotenv = require("dotenv")
+const dotenv = require('dotenv')
 dotenv.config()
 
 const url = process.env.MONGODB_URL
 
 console.log('connecting to', url)
 
-mongoose.connect(url)
-.then(result => {
+mongoose.connect(url).then(() => {
     console.log('connected to MongoDB')
-  })
-  .catch(error => {
+}).catch(error => {
     console.log('error connecting to MongoDB:', error.message)
-  })
+})
 
 const personSchema = mongoose.Schema({
     name: {
@@ -24,11 +22,11 @@ const personSchema = mongoose.Schema({
         minLength: 8,
         validate: {
             validator: function(val) {
-                correctForm1 = /^\d{2}-\d+/
-                correctForm2 = /^\d{3}-\d+/
+                let correctForm1 = /^\d{2}-\d+/
+                let correctForm2 = /^\d{3}-\d+/
                 return (correctForm1.test(val) || correctForm2.test(val))
             },
-            message: "Phone number is not the right format"
+            message: 'Phone number is not the right format'
         }
     }
 })
@@ -41,4 +39,4 @@ personSchema.set('toJSON', {
     }
 })
 
-module.exports = mongoose.model("Person", personSchema)
+module.exports = mongoose.model('Person', personSchema)
